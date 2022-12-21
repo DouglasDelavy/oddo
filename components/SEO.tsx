@@ -27,7 +27,7 @@ export const SEO = (props: SEOProps) => {
       <meta name="robots" content="follow, index" />
       <meta content={meta.description} name="description" />
       <meta content="width=device-width, initial-scale=1" name="viewport" />
-      <link rel="icon" href="/favicon.ico" />
+      <link rel="icon" href="https://oddo.vercel.app/favicon.ico" />
       <link rel="canonical" href={`https://oddo.vercel.app${pathname}`} />
       <meta property="og:title" content={meta.title} />
       <meta property="og:description" content={meta.description} />
