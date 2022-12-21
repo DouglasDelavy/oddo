@@ -182,7 +182,7 @@ function PlayersBlips:tick()
     -- get current time
     local gameTimer = GetGameTimer()
 
-    -- some math to substract current tiem to last update dividing by elapsedTime and clamped, to have a bounds
+    -- some math to substract current time to last update dividing by elapsedTime and clamped, to have a bounds
     local timeFactor = Clamp((gameTimer - lastUpdate) / elapsedTime, 0, 1)
 
     -- Iterate for all players interpolation and setting the current position in map

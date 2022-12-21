@@ -2,9 +2,9 @@ import { compareDesc } from "date-fns";
 
 import { allPosts } from "contentlayer/generated";
 
-import { Footer } from "../../components/footer";
-import { NavBar } from "../../components/navbar";
-import { Posts } from "../../components/posts";
+import { Footer } from "@/components/footer";
+import { NavBar } from "@/components/navbar";
+import { Posts } from "@/components/posts";
 
 export default function Post() {
   const posts = allPosts.sort((a, b) => {

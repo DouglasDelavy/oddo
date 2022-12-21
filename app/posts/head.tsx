@@ -1,5 +1,5 @@
 import { SEO } from "@/components/SEO";
 
 export default function Head() {
-  return <SEO />;
+  return <SEO title="Oddo Posts" />;
 }

@@ -2,7 +2,7 @@ import { Footer } from "components/footer";
 import { NavBar } from "components/navbar";
 import { allPosts } from "contentlayer/generated";
 
-import { PostLayout } from "../../../components/post";
+import { PostLayout } from "@/components/post";
 
 type PostProps = {
   params: { slug: string };

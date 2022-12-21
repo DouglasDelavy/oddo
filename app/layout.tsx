@@ -1,7 +1,7 @@
 import { Roboto } from "@next/font/google";
 
-import "../styles/globals.css";
-import "../styles/prism-atom-dark.css";
+import "@/styles/globals.css";
+import "@/styles/prism-atom-dark.css";
 
 const RobotoFont = Roboto({
   subsets: ["latin"],
