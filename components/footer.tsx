@@ -1,4 +1,5 @@
-import { FaTwitter, FaGithub, FaLinkedin } from "react-icons/fa";
+import Link from "next/link";
+import { FaTwitter, FaGithub, FaLinkedin, FaDiscord } from "react-icons/fa";
 
 const SOCIALS = [
   {
@@ -12,6 +13,10 @@ const SOCIALS = [
   {
     url: "https://www.linkedin.com/in/douglas-delavy-0804b8205/",
     icon: <FaLinkedin size={20} />,
+  },
+  {
+    url: "http://discord.fivepunch.io",
+    icon: <FaDiscord size={20} />,
   },
 ];
 
