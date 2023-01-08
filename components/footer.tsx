@@ -15,7 +15,7 @@ const SOCIALS = [
     icon: <FaLinkedin size={20} />,
   },
   {
-    url: "http://discord.fivepunch.io",
+    url: "https://discord.com/invite/qEjUwvj5TQ",
     icon: <FaDiscord size={20} />,
   },
 ];
