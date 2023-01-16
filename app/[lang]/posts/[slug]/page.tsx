@@ -3,9 +3,10 @@ import { NavBar } from "components/navbar";
 import { allPosts } from "contentlayer/generated";
 
 import { PostLayout } from "@/components/post";
+import { Locale } from "@/i18n-config";
 
 type PostProps = {
-  params: { lang: string; slug: string };
+  params: { lang: Locale; slug: string };
 };
 
 export const dynamicParams = false;
@@ -27,7 +28,7 @@ export default function Post({ params }: PostProps) {
       <NavBar />
 
       <main className="w-full py-8 flex-grow">
-        <PostLayout post={post} />
+        <PostLayout post={post} lang={params.lang} />
       </main>
 
       <Footer />

@@ -2,12 +2,13 @@ import { compareDesc } from "date-fns";
 
 import { allPosts } from "contentlayer/generated";
 
+import { Locale } from "@/i18n-config";
 import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
 import { Posts } from "@/components/posts";
 
 type PostProps = {
-  params: { lang: string };
+  params: { lang: Locale };
 };
 
 export default function Post({ params }: PostProps) {
@@ -22,7 +23,7 @@ export default function Post({ params }: PostProps) {
       <NavBar />
 
       <main className="flex-grow">
-        <Posts posts={posts} />
+        <Posts posts={posts} lang={params.lang} />
       </main>
 
       <Footer />

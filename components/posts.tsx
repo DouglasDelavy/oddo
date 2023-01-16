@@ -1,11 +1,14 @@
 import { Post } from "contentlayer/generated";
+
+import { Locale } from "@/i18n-config";
 import { PostCard } from "./post-card";
 
 type PostsProps = {
   posts: Post[];
+  lang: Locale;
 };
 
-export const Posts = ({ posts }: PostsProps) => {
+export const Posts = ({ posts, lang }: PostsProps) => {
   return (
     <div className="mt-16">
       <header className="text-neutral-200">
@@ -14,7 +17,7 @@ export const Posts = ({ posts }: PostsProps) => {
 
       <ul>
         {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
+          <PostCard key={post._id} post={post} lang={lang} />
         ))}
       </ul>
     </div>

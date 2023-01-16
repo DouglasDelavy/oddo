@@ -2,8 +2,14 @@ import { allPosts } from "contentlayer/generated";
 
 import { SEO } from "@/components/SEO";
 
-export default function Head({ params }: { params: { slug: string } }) {
-  const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
+type Props = {
+  params: { slug: string; lang: string };
+};
+
+export default function Head({ params }: Props) {
+  const post = allPosts.find(
+    (post) => post.slug === params.slug && post.lang === params.lang
+  );
 
   if (!post) {
     return <SEO />;
