@@ -1,0 +1,212 @@
+---
+title: "Como sincronizar as posições dos jogadores"
+summary: "Um dos maiores desafios ao desenvolver um jogo multiplayer é fazer com que os jogadores sincronizem."
+date: "2022-12-21"
+author: "Oddo"
+image: "/images/syncronize-players-positions/banner.gif"
+---
+
+Um dos maiores desafios ao desenvolver um jogo multiplayer é fazer com que os jogadores sincronizem.
+
+Ao desenvolver o modo espectador para um battle royale, me deparei com o seguinte problema.
+
+Cada espectador precisa ver todos os jogadores da partida no mapa. Mas como desenvolveríamos isso?
+
+OK. Concordo, haveria uma solução simples para fazer o servidor enviar a cada quadro a posição de todos os jogadores para cada visualizador.
+Mas com 2 ou 3 jogadores estaria bom e nosso problema seria resolvido, mas precisávamos escalar para 100 jogadores,
+portanto, enviar cada quadro provavelmente teria um grande problema de desempenho com nosso servidor.
+
+Portanto, surgiu a primeira solução, vamos adicionar um intervalo de 3 segundos para cada atualização.
+
+A implementação do lado do servidor seria simples, crie um loop que a cada 3 segundos pegue a posição de todos os jogadores e envie para todos os visualizadores.
+
+**Server**
+
+```lua
+local INTERVAL_BETWEEN_UPDATES_IN_MS = 3 * 1000;
+
+function EmitEventToSpectators(eventName, data)
+    TriggerClientEvent(eventName, -1, data)
+end
+
+CreateThread(function()
+    while true do
+        -- Getting all players
+        local players = GetPlayers()
+        local playersCoords = {}
+
+        -- Iterate in all players to get your position
+        for _, serverId in ipairs(players) do
+            local playerPed = GetPlayerPed(serverId)
+
+            playersCoords[serverId] = GetEntityCoords(playerPed)
+        end
+
+        -- Send to all spectators
+        EmitEventToSpectators("royale:client:updatePlayersCoords", playersCoords)
+
+        -- Wait to make all again
+        Wait(INTERVAL_BETWEEN_UPDATES_IN_MS)
+    end
+end)
+```
+
+In the client part, the viewer would listen for the update event and create or update the player's marker on the map.
+
+**Client**
+
+```lua
+PlayersBlips = {}
+
+local players = {}
+local updateEventCookie = nil
+
+local function CreatePlayerBlip(serverId, coords)
+    local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
+
+    SetBlipSprite(blip, 1)
+    SetBlipAsShortRange(blip, true)
+
+    players[serverId] = { blip = blip }
+end
+
+local function UpdatePlayerBlip(serverId, coords)
+    local player = players[serverId]
+
+    SetBlipCoords(player.blip, coords.x, coords.y, coords.z)
+end
+
+local function UpdatePlayersCoords(playersCoords)
+    for serverId, coords in pairs(playersCoords) do
+        if players[serverId] then
+            UpdatePlayerBlip(serverId, coords)
+        else
+            CreatePlayerBlip(serverId, coords)
+        end
+    end
+end
+
+-- Called when resource start
+function PlayersBlips:start()
+    updateEventCookie = RegisterNetEvent("royale:client:updatePlayersCoords", UpdatePlayersCoords)
+end
+
+-- Called every frame
+function PlayersBlips:tick()
+end
+
+-- Called when resource stop
+function PlayersBlips:shutdown()
+    RemoveEventHandler(updateEventCookie)
+end
+```
+
+And done, we arrived at a solution, the server will not be overloaded and spectators will see the position of all players on the map.
+
+<div align="center">
+  <Image
+    alt={"Example 1"}
+    src={"/images/syncronize-players-positions/example_start.gif"}
+    width={600}
+    height={600}
+    priority
+  />
+</div>
+
+However, we have the player markers on the map jumping, which ends up being a problem.
+
+So we move on to a third solution, which would be to use **Interpolation**
+
+### But what is Interpolation ?
+
+Basically interpolation is a technique used to synchronize the position of players in a network. The aim is to avoid latency issues and make the gaming experience smoother.
+
+It works by comparing the player's current position with the past position known by the client. The client then calculates the character's position at a given time in the past using a technique known as linear interpolation.
+
+And that's it, that's exactly what we need.
+
+To begin we need to create the main linear interpolation function which is called **Lerp**
+
+```lua
+function Lerp(a, b, t)
+    return a + (b - a) * t
+end
+```
+
+Now we are going to make some modifications in the previous functions to save the time difference with each update received from the server, and modify the way of creating and updating the map marker.
+
+```lua
+local lastUpdate = 0
+local elapsedTime = 0
+
+local function CreatePlayerBlip(serverId, coords)
+    local blip = AddBlipForCoord(coords.x, coords.y, coords.z)
+
+    SetBlipSprite(blip, 1)
+    SetBlipAsShortRange(blip, true)
+
+    players[serverId] = { blip = blip, start = coords, current = coords, destination = coords }
+end
+
+local function UpdatePlayerBlip(serverId, coords)
+    local player = players[serverId]
+
+    player.destination = coords
+    player.start = player.current
+end
+
+local function UpdatePlayersCoords(playersCoords)
+    local gameTimer = GetGameTimer()
+
+    elapsedTime = gameTimer - lastUpdate
+    lastUpdate = gameTimer
+
+    for serverId, coords in pairs(playersCoords) do
+        if players[serverId] then
+            UpdatePlayerBlip(serverId, coords)
+        else
+            CreatePlayerBlip(serverId, coords)
+        end
+    end
+end
+```
+
+Done, just create a function called every frame to make our marker smoother using our interpolation function, **Lerp**.
+
+```lua
+function Clamp(x, min, max)
+    return math.max(math.min(x, max), min)
+end
+
+function PlayersBlips:tick()
+    -- get current time
+    local gameTimer = GetGameTimer()
+
+    -- some math to substract current time to last update dividing by elapsedTime and clamped, to have a bounds
+    local timeFactor = Clamp((gameTimer - lastUpdate) / elapsedTime, 0, 1)
+
+    -- Iterate for all players interpolation and setting the current position in map
+    for _, player in pairs(players) do
+        local x = Lerp(player.start.x, player.destination.x, timeFactor)
+        local y = Lerp(player.start.y, player.destination.y, timeFactor)
+
+        player.current = vector3(x, y, player.current.z)
+
+        SetBlipCoords(player.blip, player.current)
+    end
+end
+```
+
+<div align="center">
+  <Image
+    alt={"Example 2"}
+    src={"/images/syncronize-players-positions/example_finished.gif"}
+    width={600}
+    height={600}
+    priority
+  />
+</div>
+
+Amazing. We were able to solve the problem by having a lightweight server and smooth viewing for our viewers.
+
+**If you liked this content and want to see more, join in your** <Link href="https://discord.com/invite/qEjUwvj5TQ">Discord Community</Link>

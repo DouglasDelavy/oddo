@@ -22,6 +22,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               className="object-cover rounded"
               fill
               unoptimized
+              priority
             />
           </div>
         )}

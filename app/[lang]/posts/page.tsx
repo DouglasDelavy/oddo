@@ -6,10 +6,16 @@ import { Footer } from "@/components/footer";
 import { NavBar } from "@/components/navbar";
 import { Posts } from "@/components/posts";
 
-export default function Post() {
-  const posts = allPosts.sort((a, b) => {
-    return compareDesc(new Date(a.date), new Date(b.date));
-  });
+type PostProps = {
+  params: { lang: string };
+};
+
+export default function Post({ params }: PostProps) {
+  const posts = allPosts
+    .filter((post) => post.lang === params.lang)
+    .sort((a, b) => {
+      return compareDesc(new Date(a.date), new Date(b.date));
+    });
 
   return (
     <div className="w-screen h-screen px-4 py-8 flex flex-col items-center">

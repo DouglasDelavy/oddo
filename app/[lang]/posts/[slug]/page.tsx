@@ -5,16 +5,18 @@ import { allPosts } from "contentlayer/generated";
 import { PostLayout } from "@/components/post";
 
 type PostProps = {
-  params: { slug: string };
+  params: { lang: string; slug: string };
 };
 
 export const dynamicParams = false;
 
 export const generateStaticParams = async () =>
-  allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
+  allPosts.map((post) => ({ slug: post.slug }));
 
 export default function Post({ params }: PostProps) {
-  const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
+  const post = allPosts.find(
+    (post) => post.slug === params.slug && post.lang === params.lang
+  );
 
   if (!post) {
     return null;
