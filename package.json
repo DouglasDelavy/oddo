@@ -9,15 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@next/font": "13.0.6",
+    "@formatjs/intl-localematcher": "^0.2.32",
+    "@next/font": "13.1.2",
     "@types/node": "18.11.17",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",
     "contentlayer": "^0.2.9",
     "date-fns": "^2.29.3",
     "eslint": "8.30.0",
-    "eslint-config-next": "13.0.6",
-    "next": "13.0.6",
+    "eslint-config-next": "13.1.2",
+    "negotiator": "^0.6.3",
+    "next": "13.1.2",
     "next-contentlayer": "^0.2.9",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.4.2",
     "@tailwindcss/typography": "^0.5.8",
+    "@types/negotiator": "^0.6.1",
     "autoprefixer": "^10.4.13",
     "postcss": "^8.4.20",
     "tailwindcss": "^3.2.4"

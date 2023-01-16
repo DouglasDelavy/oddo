@@ -3,6 +3,12 @@ import { defineDocumentType, makeSource } from "contentlayer/source-files";
 import remarkGfm from "remark-gfm";
 import rehypePrism from "rehype-prism-plus";
 
+const getLocale = (path) => {
+  const pathArray = path.split(".");
+
+  return pathArray.length > 2 ? pathArray.slice(-2)[0] : "en";
+};
+
 export const Post = defineDocumentType(() => ({
   name: "Post",
   filePathPattern: `**/*.mdx`,
@@ -37,7 +43,18 @@ export const Post = defineDocumentType(() => ({
   computedFields: {
     url: {
       type: "string",
-      resolve: (post) => `/posts/${post._raw.flattenedPath}`,
+      resolve: (post) =>
+        `/posts/${post._raw.flattenedPath.replace(/(\.pt-br)/, "")}`,
+    },
+    slug: {
+      type: "string",
+      resolve: (doc) => doc._raw.sourceFileName.replace(/(\.pt-br)?\.mdx$/, ""),
+    },
+    lang: {
+      type: "string",
+      resolve: (doc) => {
+        return getLocale(doc._raw.sourceFilePath);
+      },
     },
   },
 }));

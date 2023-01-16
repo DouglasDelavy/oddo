@@ -1,24 +1,24 @@
 ---
-title: "How to syncronize players positions in a Battle Royale"
-summary: "One of the biggest challenges when developing a multiplayer game is getting the players to sync up."
+title: "Como sincronizar as posições dos jogadores"
+summary: "Um dos maiores desafios ao desenvolver um jogo multiplayer é fazer com que os jogadores sincronizem."
 date: "2022-12-21"
 author: "Oddo"
 image: "/images/syncronize-players-positions/banner.gif"
 ---
 
-One of the biggest challenges when developing a multiplayer game is getting the players to sync up.
+Um dos maiores desafios ao desenvolver um jogo multiplayer é fazer com que os jogadores sincronizem.
 
-When developing spectator mode for a battle royale, I came across the following problem.
+Ao desenvolver o modo espectador para um battle royale, me deparei com o seguinte problema.
 
-Each spectator needs to see all the players in the match on the map. But how would we develop this?
+Cada espectador precisa ver todos os jogadores da partida no mapa. Mas como desenvolveríamos isso?
 
-Ok. I agree, there would be a simple solution to make the server send each frame the position of all players for each viewer.
-But with 2 or 3 players it would be fine and our problem would be solved, but we needed to scale this to 100 players,
-so sending each frame would have probably a big performance problem with our server.
+OK. Concordo, haveria uma solução simples para fazer o servidor enviar a cada quadro a posição de todos os jogadores para cada spec.
+Mas com 2 ou 3 jogadores nosso problema seria resolvido, mas precisávamos escalar para 100 jogadores,
+porém, enviar every frame seria um grande problema de desempenho com nosso servidor.
 
-Therefore, the first solution came up, let's add a 3 second interval for each update.
+Assim, surgiu a primeira solução, vamos adicionar um intervalo de 3 segundos para cada atualização.
 
-Server-side implementation would be simple, create a loop that every 3 seconds takes the position of all players and sends it to all viewers.
+A implementação do lado do servidor seria simples, crie um loop que a cada 3 segundos pegue a posição de todos os jogadores da partida e envie para todos os specs.
 
 **Server**
 
@@ -51,7 +51,7 @@ CreateThread(function()
 end)
 ```
 
-In the client, the viewer would listen for the update event and create or update the player's marker on the map.
+No cliente, o spec escutaria o evento de atualização e criaria ou atualizaria o marcador do jogador no mapa.
 
 **Client**
 
@@ -101,7 +101,7 @@ function PlayersBlips:shutdown()
 end
 ```
 
-And done, we arrived at a solution, the server will not be overloaded and spectators will see the position of all players on the map.
+E pronto, chegamos a uma solução, o servidor não ficará sobrecarregado e os espectadores verão a posição de todos os jogadores no mapa.
 
 <div align="center">
   <Image
@@ -113,19 +113,19 @@ And done, we arrived at a solution, the server will not be overloaded and specta
   />
 </div>
 
-However, we have the player markers on the map jumping, which ends up being a problem.
+Porém, temos os marcadores dos jogadores no mapa estão pulando, o que acaba sendo um grande problema.
 
-So we move on to a third solution, which would be to use **Interpolation**
+Então passamos para uma terceira solução, que seria usar **Interpolação**
 
-### But what is Interpolation ?
+### Mas o que é Interpolação ?
 
-Basically interpolation is a technique used to synchronize the position of players in a network. The aim is to avoid latency issues and make the gaming experience smoother.
+Basicamente, a interpolação é uma técnica usada para sincronizar a posição dos jogadores. O objetivo é evitar problemas de latência e tornar a experiência de jogo mais suave.
 
-It works by comparing the player's current position with the past position known by the client. The client then calculates the character's position at a given time in the past using a technique known as linear interpolation.
+Funciona comparando a posição atual do jogador com a posição anterior conhecida pelo cliente. O cliente então calcula a posição do personagem em um determinado momento no passado usando uma técnica conhecida como interpolação linear.
 
-And that's it, that's exactly what we need.
+E é isso, é exatamente disso que precisamos.
 
-To begin we need to create the main linear interpolation function which is called **Lerp**
+Para começar, precisamos criar a principal função de interpolação linear chamada **Lerp**
 
 ```lua
 function Lerp(a, b, t)
@@ -133,7 +133,7 @@ function Lerp(a, b, t)
 end
 ```
 
-Now we are going to make some modifications in the previous functions to save the time difference with each update received from the server, and modify the way of creating and updating the map marker.
+Agora vamos fazer algumas modificações nas funções anteriores para salvar a diferença de horário a cada atualização recebida do servidor, e modificar a forma de criar e atualizar o marcador no mapa.
 
 ```lua
 local lastUpdate = 0
@@ -171,7 +171,7 @@ local function UpdatePlayersCoords(playersCoords)
 end
 ```
 
-Done, just create a function called every frame to make our marker smoother using our interpolation function, **Lerp**.
+Pronto, basta criar uma função every frame para deixar nosso marcador mais suave usando nossa função de interpolação, **Lerp**.
 
 ```lua
 function Clamp(x, min, max)
@@ -207,6 +207,6 @@ end
   />
 </div>
 
-Amazing. We were able to solve the problem by having a lightweight server and smooth viewing for our players.
+Incrível. Conseguimos resolver o problema com um servidor leve e uma visualização suave para nossos specs.
 
-**If you liked this content and want to see more, join in your** <Link href="https://discord.com/invite/qEjUwvj5TQ">Discord Community</Link>
+**Se você gostou deste conteúdo e quer ver mais, entre em nossa** <Link href="https://discord.com/invite/qEjUwvj5TQ">Comunidade no Discord</Link>

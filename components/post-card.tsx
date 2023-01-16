@@ -1,13 +1,15 @@
 import Image from "next/image";
+import { format, parseISO } from "date-fns";
 
 import { Post } from "contentlayer/generated";
-import { format, parseISO } from "date-fns";
+import { DateLocale, Locale } from "@/i18n-config";
 
 type PostCardProps = {
   post: Post;
+  lang: Locale;
 };
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = ({ post, lang }: PostCardProps) => {
   return (
     <div className="mt-4 p-4 max-w-[20rem] md:max-w-[34rem] bg-zinc-700 rounded-lg">
       <a
@@ -22,6 +24,7 @@ export const PostCard = ({ post }: PostCardProps) => {
               className="object-cover rounded"
               fill
               unoptimized
+              priority
             />
           </div>
         )}
@@ -33,10 +36,12 @@ export const PostCard = ({ post }: PostCardProps) => {
         <p className="mt-1 line-clamp-2 text-neutral-400">{post.summary}</p>
 
         <div className="mt-4 flex gap-1 text-xs text-neutral-400">
+          <p>{post.author}</p> -
           <time dateTime={post.date}>
-            {format(parseISO(post.date), "LLLL d, yyyy")}
-          </time>{" "}
-          - <p>{post.author}</p>
+            {format(parseISO(post.date), "LLLL d, yyyy", {
+              locale: DateLocale[lang],
+            })}
+          </time>
         </div>
       </a>
     </div>
