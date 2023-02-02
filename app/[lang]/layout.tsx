@@ -3,6 +3,8 @@ import { Roboto } from "@next/font/google";
 import "@/styles/globals.css";
 import "@/styles/prism-atom-dark.css";
 
+import { Analytics } from "@/components/analytics";
+
 import { i18n } from "../../i18n-config";
 
 export async function generateStaticParams() {
@@ -29,6 +31,7 @@ export default function RootLayout({
         className={`${RobotoFont.variable} font-sans bg-zinc-800 text-xs text-neutral-200`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
