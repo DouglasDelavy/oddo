@@ -1,13 +1,12 @@
-import Link from "next/link";
 import { FaTwitter, FaGithub, FaLinkedin, FaDiscord } from "react-icons/fa";
 
 const SOCIALS = [
   {
-    url: "https://github.com/OddoAkbar",
+    url: "https://github.com/DouglasDelavy",
     icon: <FaGithub size={20} />,
   },
   {
-    url: "https://twitter.com/OddoAkbar",
+    url: "https://twitter.com/DouglasDelavy",
     icon: <FaTwitter size={20} />,
   },
   {
